@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
+        version="2.1">
+
+    <tlib-version>1.0</tlib-version>
+    <short-name>my-pager</short-name>
+    <uri>http://mycompany.com</uri>
+
+    <!-- Invoke 'Generate' action to add tags or functions -->
+    <tag>
+        <!--tag的名字-->
+        <name>page</name>
+        <!--tag对应java类的名字-->
+        <tag-class>com.common.tag.PageTag</tag-class>
+        <!--关于body-content 有三个值可选;empty：标签体必须为空;
+        jsp：标签由其他jsp元素组成比如标签中含有<%=attributeName%>的jsp元素,那么此时body-content的值就是实际attributeName传入的值;
+        tagdependent:有标签解释不带jsp转换-->
+        <body-content>empty</body-content>
+        <attribute>
+            <!--分页实体类-->
+            <name>pager</name>
+            <!--是否是必须的-->
+            <required>true</required>
+            <!--设置属性值是否可以在jsp编译成Servlet的时候自动生成-->
+            <rtexprvalue>true</rtexprvalue>
+            <!--参数类型-->
+            <type>com.common.tag.Pager</type>
+        </attribute>
+    </tag>
+</taglib>
