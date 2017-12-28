@@ -13,36 +13,11 @@ import java.util.List;
 /**
  * Created by cai on 2017/11/14.
  */
-public class UserDao extends BaseDao{
-
-
-    /**
-     * 添加文章
-     *
-     * @param title
-     * @param studentId
-     * @param content
-     * @return
-     */
-    public boolean addArticle(String title, Integer studentId, String content) {
-        Connection connection = dbHelper.getConnection();
-        int result = 0;
-        String sql = "INSERT INTO article (studentId,title,content) values (?,?,?)";
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            dbHelper.setSqlParam(preparedStatement, studentId, title, content);
-            result = preparedStatement.executeUpdate();//返回结果是插入了几条
-            connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return result > 0 ? true : false;
-    }
+public class UserDao extends BaseDao {
 
     /**
      * 插入新学生登陆信息
      *
-     * @return
      */
     public boolean insertStudentInfo(String name, String password, String school) {
         Connection connection = dbHelper.getConnection();
@@ -58,12 +33,11 @@ public class UserDao extends BaseDao{
      *
      * @param name     用户名
      * @param password 密码
-     * @return
      */
     public Student verifyStudentInfo(String name, String password) {
         Connection connection = dbHelper.getConnection();
         Student student = null;
-        String sql = "SELECT id,name,password " +
+        String sql = "SELECT id,name,password,role,school " +
                 "FROM T_Student " +
                 "WHERE " +
                 "name = ? AND password = ?";
@@ -74,9 +48,6 @@ public class UserDao extends BaseDao{
 
     /**
      * 查询学生列表
-     *
-     * @param name
-     * @return
      */
     public List<Student> queryStudent(String name) {
         String sql = null;
@@ -90,54 +61,22 @@ public class UserDao extends BaseDao{
         return students;
     }
 
+    /**
+     * 修改学生账号信息
+     *
+     * @param studentId 学生id
+     * @return 修改成功为true或者失败false
+     */
+    public boolean modifyStudentInfo(int studentId, String name, String school, String password) {
+        String sql = "UPDATE T_Student SET name = ? ,school = ? , password = ? WHERE id = ?";
+        System.out.println(school);
+        return dbHelper.executeUpdateSql(sql, name, school, password, studentId);
+    }
 
-//
-//    /**
-//     * 通过学生ID来查询文章
-//     * @param studentId
-//     * @return
-//     */
-//    public List<ArticleDetail> queryArticleByStudentId(Integer studentId){
-//        List<ArticleDetail> articleDetails = new ArrayList<>();
-//        return articleDetails;
-//    }
-//
-//    /**
-//     * 删除对应文章的id
-//     * @param articleId
-//     * @return
-//     */
-//    public boolean deleteArticle(int articleId){
-//        int result = 0;
-//        String sql = "DELETE FROM article WHERE id = ?";
-//        Connection connection = JDBC.getConnection();
-//        try {
-//            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-//            JDBC.setSqlParam(preparedStatement,articleId);
-//            result = preparedStatement.executeUpdate();
-//            connection.close();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return result > 0? true : false;
-//    }
-//
-//    /**
-//     * 修改文章内容
-//     * @return
-//     */
-//    public boolean modifyArticle(int articleId,String content){
-//        String sql = "UPDATE article SET content = ? WHERE id = ?";
-//        return JDBC.executeUpdateSql(sql,content,articleId);
-//    }
-//
-//    /**
-//     * 修改学生账号信息
-//     * @param studentId
-//     * @return
-//     */
-//    public boolean modifyStudentInfo(int studentId,String password){
-//        String sql = "UPDATE student SET password = ? WHERE id = ?";
-//        return JDBC.executeUpdateSql(sql,password,studentId);
-//    }
+    public boolean deleteStudent(int studentId){
+        String sql = "DELETE FROM T_Student WHERE id = ? ";
+        return dbHelper.executeUpdateSql(sql,studentId);
+    }
+
+
 }

@@ -23,7 +23,7 @@
                 <td>content : <textarea rows="5" cols="50" name="content"></textarea></td>
             </tr>
             <tr>
-                <td><input type="button" id="addUploadButton" value="添加文章封面"/></td>
+                <td><input type="file" name="picture" value="添加文章封面"/></td>
             </tr>
         </table>
         <input type="submit" value="提交">

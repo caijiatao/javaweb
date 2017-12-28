@@ -22,7 +22,7 @@ import java.util.List;
  * Created by cai on 2017/11/1.
  */
 
-@WebServlet(name = "User",urlPatterns = {"/login.do","/register.do","/queryStudent.do"})
+@WebServlet(name = "User", urlPatterns = {"/login.do", "/register.do", "/queryStudent.do","/editStudentInfo.do","/deleteUser.do"})
 @MultipartConfig
 public class UserServlet extends HttpServlet {
     private UserService userService = new UserServiceImpl();
@@ -31,9 +31,9 @@ public class UserServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("utf-8");
         response.setCharacterEncoding("utf-8");
-        Method method = ServletUtil.getMethod(this.getClass(),request,response);
+        Method method = ServletUtil.getMethod(this.getClass(), request, response);
         try {
-            method.invoke(this,request,response);
+            method.invoke(this, request, response);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
@@ -49,10 +49,10 @@ public class UserServlet extends HttpServlet {
     /**
      * 记录用户登陆状态
      *
-     * @param request
-     * @param response
-     * @throws IOException
-     * @throws ServletException
+     * @param request 请求对象
+     * @param response 响应对象
+     * @throws ServletException servlet异常
+     * @throws IOException 输入输出异常
      */
     public void login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("utf-8");
@@ -64,88 +64,79 @@ public class UserServlet extends HttpServlet {
             //如果用户不存在则还是在login页面
             requestDispatcher = request.getRequestDispatcher("login.jsp");
         }
+
         request.getSession().setAttribute("student", student);//登陆成功设置session
         requestDispatcher.forward(request, response);
     }
 
     /**
      * 查询学生
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
+     *
+     * @param request 请求对象
+     * @param response 响应对象
+     * @throws ServletException servlet异常
+     * @throws IOException 输入输出异常
      */
-    public void queryStudent(HttpServletRequest request , HttpServletResponse response) throws ServletException, IOException {
+    public void queryStudent(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String name = request.getParameter("name");
         List<Student> students = userService.selectStudent(name);
-        request.setAttribute("students",students);
-        request.getRequestDispatcher("listStudent.jsp").forward(request,response);
+        request.setAttribute("students", students);
+        request.getRequestDispatcher("listStudent.jsp").forward(request, response);
     }
 
     /**
      * 学生注册
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
+     *
+     * @param request 请求对象
+     * @param response 响应对象
+     * @throws ServletException servlet异常
+     * @throws IOException 输入输出异常
      */
-    public void register(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+    public void register(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String name = request.getParameter("name");
         String password = request.getParameter("password");
         String school = request.getParameter("school");
-        if(userService.addStudent(name,password,school)){
+        if (userService.addStudent(name, password, school)) {
             //插入成功返回登陆界面
-            request.getRequestDispatcher("login.jsp").forward(request,response);
-        }
-        else{
+            request.getRequestDispatcher("login.jsp").forward(request, response);
+        } else {
             //插入失败提示错误
-            request.getRequestDispatcher("error.jsp").forward(request,response);
+            request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
 
+    /**
+     * 修改学生信息
+     *
+     * @param request 请求对象
+     * @param response 响应对象
+     * @throws ServletException servlet异常
+     * @throws IOException 输入输出异常
+     */
+    public void editStudentInfo(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Student student = (Student) request.getSession().getAttribute("student");
+        if(userService.modifyStudentInfo(student.getId(),request.getParameter("name"),request.getParameter("school"),request.getParameter("password"))){
+            request.getRequestDispatcher("login.jsp").forward(request,response);
+        }else{
+            request.getRequestDispatcher("error.jsp").forward(request,response);
+        }
 
+    }
 
-//    /**
-//     * @param request
-//     * @param response
-//     * @throws ServletException
-//     * @throws IOException
-//     */
-//    private void publishArticle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        StudentBean studentInfo = (StudentBean) request.getSession().getAttribute("studentInfo");
-//        Integer studentId = studentInfo != null ? studentInfo.getId() : 0;
-//        boolean publishArticleResult = userService.publishArticle(studentId, request.getParameter("title"), request.getParameter("content"));
-//        if (publishArticleResult) {
-//            request.getRequestDispatcher("success.jsp").forward(request, response);
-//        } else {
-//            request.getRequestDispatcher("error.jsp").forward(request, response);
-//        }
-//    }
-
-//
-//
-
-
-//
-//    public void deleteArticle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        int articleId = Integer.parseInt(request.getParameter("articleId"));
-//        userService.deleteArticle(articleId);
-//        request.setAttribute("articleDetailList", userService.queryArticleDetail(0, null, null, request));
-//    }
-//
-//    public void modifyArticle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        int articleId = request.getParameter("articleId") == null ? 0 : Integer.parseInt(request.getParameter("articleId"));
-//        RequestDispatcher requestDispatcher = request.getRequestDispatcher("articleDetail.jsp");
-//        if (articleId == 0) {
-//            requestDispatcher = request.getRequestDispatcher("error.jsp");//没有传文章id
-//        }
-//        userService.modifyArticle(articleId, request.getParameter("content"));
-//        requestDispatcher.forward(request, response);
-//    }
-//
-//    public void modifyPassword(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        String newPassword = request.getParameter("password");
-//        int studentId = request.getParameter("studentId") != null ? Integer.parseInt(request.getParameter("studentId")) : 0;
-//        userService.modifyStudentInfo(studentId, newPassword);
-//    }
+    /**
+     * 删除用户
+     *
+     * @param request 请求对象
+     * @param response 响应对象
+     * @throws ServletException servlet异常
+     * @throws IOException 输入输出异常
+     */
+    public void deleteUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if(userService.deleteStudent(Integer.parseInt(request.getParameter("studentId").toString()))){
+            request.getRequestDispatcher("login.jsp").forward(request,response);
+        }
+        else{
+            request.getRequestDispatcher("error.jsp").forward(request,response);
+        }
+    }
 }

@@ -14,7 +14,7 @@
         <!--tag的名字-->
         <name>page</name>
         <!--tag对应java类的名字-->
-        <tag-class>com.common.tag.PageTag</tag-class>
+        <tag-class>com.bnuz.javaweb.tag.PageTag</tag-class>
         <!--关于body-content 有三个值可选;empty：标签体必须为空;
         jsp：标签由其他jsp元素组成比如标签中含有<%=attributeName%>的jsp元素,那么此时body-content的值就是实际attributeName传入的值;
         tagdependent:有标签解释不带jsp转换-->
@@ -27,7 +27,7 @@
             <!--设置属性值是否可以在jsp编译成Servlet的时候自动生成-->
             <rtexprvalue>true</rtexprvalue>
             <!--参数类型-->
-            <type>com.common.tag.Pager</type>
+            <type>com.bnuz.javaweb.tag.Pager</type>
         </attribute>
     </tag>
 </taglib>

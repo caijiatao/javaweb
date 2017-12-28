@@ -11,7 +11,7 @@ public class PagerHelper {
      * @param totalRows 总记录数
      * @param linkUrl 要链接的url
      * @param request 请求的request
-     * @return
+     * @return 分页实体
      */
     public static Pager getPager(int totalRows,Integer pageSize,Integer currentPage,String linkUrl,HttpServletRequest request){
         currentPage = currentPage == null ? 1 : currentPage;
@@ -22,9 +22,16 @@ public class PagerHelper {
         pager.setLinkUrl(linkUrl);
         request.setAttribute("pager",pager);
         request.setAttribute("totalPage",pager.getTotalPage());
+        request.setAttribute("currentPage", currentPage);
+        request.setAttribute("pageSize", pageSize);
         return pager;
     }
 
+    /**
+     * 生成分页限制条件
+     * @param sql 要生成限制的sql
+     * @return 生成好限制的sql
+     */
     public static String generateLimitCondition(String sql){
         return sql.concat(" LIMIT ?,? ");
     }

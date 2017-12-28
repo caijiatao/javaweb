@@ -34,7 +34,7 @@ public class DBHelper {
     /**
      * 获得jdbc一个连接
      *
-     * @return
+     * @return 数据库链接
      */
     public Connection getConnection() {
 
@@ -48,11 +48,11 @@ public class DBHelper {
 
     /**
      * 关闭数据库相关的资源，如果为null则无需关闭
-     * @param resultSet
+     * @param resultSet 查询结果集
      * @param preparedStatement
      * @param connection
      */
-    public void closeAll(ResultSet resultSet, PreparedStatement preparedStatement, Connection connection) {
+    public static void closeAll(ResultSet resultSet, PreparedStatement preparedStatement, Connection connection) {
         try {
             if (resultSet != null) {
                 resultSet.close();
@@ -71,9 +71,9 @@ public class DBHelper {
     /**
      * 对参数进行设置
      * @param preparedStatement
-     * @param objects
-     * @return
-     * @throws SQLException
+     * @param objects 设置preparedStatement的参数，按顺序传入
+     * @return 设置好参数的preparedstatement
+     * @throws SQLException sql异常暂时不作任何处理
      */
     public static PreparedStatement setSqlParam(PreparedStatement preparedStatement,Object... objects) throws SQLException {
         for(int i = 1;i <= objects.length;i++){
@@ -84,14 +84,14 @@ public class DBHelper {
 
     /**
      * 获得结果集的list
-     * @param resultSet
-     * @param clazz
-     * @return
-     * @throws SQLException
-     * @throws IllegalAccessException
-     * @throws InstantiationException
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
+     * @param resultSet 传入要转化的数据集
+     * @param clazz 传入转化成数据集的类
+     * @return 返回结果转化的list
+     * @throws SQLException sql异常
+     * @throws IllegalAccessException 不合法方法
+     * @throws InstantiationException 实例化异常
+     * @throws NoSuchMethodException 反射没有对应方法
+     * @throws InvocationTargetException 调用异常
      */
     public static List dataToList(ResultSet resultSet , Class clazz,Connection connection)
             throws SQLException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
@@ -116,15 +116,14 @@ public class DBHelper {
             }
             dataList.add(object);
         }
-        resultSet.close();
-        connection.close();
+        closeAll(resultSet,null,connection);
         return dataList;
     }
 
     /**
      * 将string的日期转化成sql 包里面的日期
-     * @param date
-     * @return
+     * @param date 日期
+     * @return sql类型的日期
      */
     public static Date stringToSqlDate(String date){
         Date sqlDate = null;
@@ -142,7 +141,7 @@ public class DBHelper {
      * 返回查询结果集
      * @param sql sql语句
      * @param objects preparedStatement里面需要设置的参数
-     * @return
+     * @return 查询的结果
      */
     public ResultSet executeQuery(String sql,Connection connection,Object ...objects){
         ResultSet resultSet = null;
@@ -156,6 +155,14 @@ public class DBHelper {
         return resultSet;
     }
 
+    /**
+     * 查询方法重载
+     * @param sql 要执行的sql
+     * @param clazz 返回list的数据类型
+     * @param connection 数据库链接
+     * @param objects preparestatement设置的参数
+     * @return 返回查询的list
+     */
     public List executeQuery(String sql,Class clazz ,Connection connection, Object ...objects){
 
         ResultSet resultSet = null;
@@ -182,9 +189,9 @@ public class DBHelper {
 
     /**
      * 执行更新插入删除语句
-     * @param sql
-     * @param objects
-     * @return
+     * @param sql 更新的sql
+     * @param objects 参数列表
+     * @return 更新成功为true
      */
     public boolean executeUpdateSql(String sql,Object ...objects){
         connection = getConnection();
@@ -202,8 +209,8 @@ public class DBHelper {
 
     /**
      * 通过表名生成统计数据条数的sql
-     * @param formName
-     * @return
+     * @param formName 表名
+     * @return 返回生成的计算数据的语句
      */
     public String generateCountSql(String formName){
         String countSQL = "SELECT count(*) FROM " + formName;
@@ -212,15 +219,14 @@ public class DBHelper {
 
     /**
      * 生成统计数据条数的条件Sql
-     * @param conditions
-     * @return
+     * @param conditions sql拼接where
+     * @return 拼接好的sql语句
      */
     public String generateCountConditionSql(String countSQL,String ...conditions){
         countSQL = conditions.length > 0 ? countSQL + " WHERE " : countSQL;
         for(String condition : conditions){
-            countSQL.concat(condition + " = ? ");
+            countSQL += condition + " = ? ";
         }
-        System.out.println(countSQL);
         return countSQL;
     }
 }
